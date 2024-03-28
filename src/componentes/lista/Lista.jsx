@@ -1,7 +1,8 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import Meta from "./Meta";
 import { Contexto } from "../../servicios/Memoria";
 import { Outlet } from "react-router-dom";
+import { pedirMetas } from "../../servicios/Pedidos";
 
 
 
@@ -12,7 +13,7 @@ function Lista() {
     return (
         <>        
         {estado.orden.map(id => <Meta key={id} {...estado.objetos[id]}/>)}
-        <Outlet/>
+        <Outlet></Outlet>
         </>
     )
 }

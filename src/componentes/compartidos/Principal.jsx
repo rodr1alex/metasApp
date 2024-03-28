@@ -1,6 +1,6 @@
 import ListaSVG from '../../img/ListaSVG'
 import NuevaSVG from '../../img/NuevaSVG'
-import estilos from './Principal.module.css'
+import estilos from './estilos/Principal.module.css'
 import Vinculo from './Vinculo'
 
 function Principal({children}) {     

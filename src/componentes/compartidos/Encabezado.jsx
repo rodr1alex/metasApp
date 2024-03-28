@@ -1,6 +1,6 @@
 import LogoSVG from '../../img/LogoSVG';
 import PerfilSVG from '../../img/PerfilSVG';
-import estilos from './Encabezado.module.css';
+import estilos from './estilos/Encabezado.module.css';
 import Vinculo from './Vinculo';
 
 

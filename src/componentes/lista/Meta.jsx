@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import estilos from './Meta.module.css';
 import { useContext } from 'react';
 import { Contexto } from '../../servicios/Memoria';
+import { actualizarMeta } from '../../servicios/Pedidos';
 
 /*const metaMock = {
     "id":"1",
@@ -19,10 +20,14 @@ function Meta({id,icono,eventos,periodo,detalles,meta,completado}) {
     const navegar = useNavigate();
     const [estado, enviar] = useContext(Contexto);
 
-    const logrado = () =>{
+    const logrado = async () =>{
         let metaActualizar = estado.objetos[id];
         metaActualizar.completado += 1;
-        enviar({tipo:'actualizar', meta:metaActualizar});
+        await actualizarMeta(metaActualizar).then((response)=>{
+            enviar({tipo:'actualizar', meta:response});
+        }).catch((err)=>{
+            console.error(err);
+        })
     }
 
     //const {icono,eventos,periodo,detalles,meta,completado} = metaMock;

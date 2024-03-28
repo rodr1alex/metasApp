@@ -2,14 +2,13 @@ import { useContext, useEffect, useState } from 'react';
 import estilos from './Detalles.module.css';
 import { Contexto } from '../../servicios/Memoria';
 import { useNavigate, useParams } from 'react-router-dom';
+import { actualizarMeta, borrarMeta, crearMeta } from '../../servicios/Pedidos';
 
 
 function Detalles() {
-
     const {id} = useParams();
     const navegar = useNavigate();
     const [estado, enviar] = useContext(Contexto);
-
     const [form,setForm] = useState({
         id:100,
         detalles:'levantar pesas',
@@ -22,7 +21,7 @@ function Detalles() {
     });
     const {detalles,eventos,periodo,icono,meta,plazo,completado} = form;
     const frecuencia = ['dia','semana','mes','anio'];
-    const iconos = ['🏃','🤾‍♀️','😋'];
+    const iconos = ['🏃','🤾‍♀️','😋','📖','🙂'];
 
     useEffect(()=>{
         const metaMemoria = estado.objetos[id];
@@ -32,24 +31,39 @@ function Detalles() {
         if(!metaMemoria){
             return navegar('/404');
         }
-        setForm(estado.objetos[id]);
+        setForm(metaMemoria);
     },[id])  
     
-
     const onChange = (event, prop) =>{
         setForm(estado => ({...estado, [prop] : event.target.value}));
     }    
-    const crear = () => {
-        enviar({tipo:'crear', meta:form});
-        navegar('/lista');
+    const crear = async () => {
+        await crearMeta(form).then((response)=>{
+            console.log('META CREADA CON EXITO')
+            console.log(response);
+            enviar({tipo:'crear', meta:response});
+            navegar('/lista');
+        }).catch((err)=>{
+            console.error(err);
+        })
+        
     }
-    const actualizar = ()=>{
-        enviar({tipo:'actualizar', meta:form});
-        navegar('/lista');
+    const actualizar = async ()=>{
+        await actualizarMeta(form).then((response)=>{
+            enviar({tipo:'actualizar', meta:response});
+            navegar('/lista');
+        }).catch((err)=>{
+            console.error(err);
+        })        
     }
-    const eliminar = () =>{
-        enviar({tipo:'eliminar', id:form.id})
-        navegar('/lista');
+    const eliminar = async () =>{
+        await borrarMeta(form.id).then(()=>{
+            enviar({tipo:'eliminar', id:form.id})
+            navegar('/lista');
+        }).catch((err)=>{
+            console.error(err);
+        })
+        
     }
     const cancelar = () =>{
         navegar('/lista');
@@ -58,7 +72,7 @@ function Detalles() {
     return ( 
     <div className='tarjeta'>
         <form className='p-4'>
-            <label className='label'>Describe tu meta
+            <label className='label'>Describa su meta
                 <input 
                     className='input' 
                     type="text" 
@@ -66,7 +80,7 @@ function Detalles() {
                     value={detalles}
                     onChange={e=>onChange(e,'detalles')}/>
             </label>
-            <label className='label'>Con que frecuencia deseas cumplir tu meta? <span>(ej. 1 vez a la semana)</span>
+            <label className='label'>Con que frecuencia desea cumplir su meta? <span>(ej. 1 vez a la semana)</span>
                 <div className='flex mb-6'>
                     <input 
                         className='input mr-6' 
@@ -82,7 +96,7 @@ function Detalles() {
                 </div>
             </label>
             <label className='label'>
-                Cuantas veces deseas completar esta meta?
+                Cuantas veces desea completar esta meta?
                 <input 
                     className='input' 
                     type="number" 
@@ -90,7 +104,7 @@ function Detalles() {
                     onChange={e=>onChange(e,'meta')}/>
             </label>
             <label className='label'>
-                Tienes una fecha limite?
+                Tiene una fecha limite?
                 <input 
                     className='input' 
                     type="date" 
@@ -98,7 +112,7 @@ function Detalles() {
                     onChange={e=>onChange(e,'plazo')}/>
             </label>
             <label className='label'>
-                Cuantas veces haz completado ya esta meta?
+                Cuantas veces ha completado ya esta meta?
                 <input 
                     className='input' 
                     type="number" 
@@ -106,7 +120,7 @@ function Detalles() {
                     onChange={e=>onChange(e,'completado')}/>
             </label>
             <label className='label'>
-                Escoge un icono para la meta
+                Escoga un icono para la meta
                 <select 
                     className='input' 
                     value={icono}

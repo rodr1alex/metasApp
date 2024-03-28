@@ -14,7 +14,6 @@ function Layout() {
         <Pie/>
         </> 
      );
-
 }
 
 export default Layout;

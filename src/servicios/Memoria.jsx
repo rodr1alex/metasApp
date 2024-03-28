@@ -1,4 +1,71 @@
 import { Children, createContext, useReducer } from "react";
+import { actualizarMeta, borrarMeta, crearMeta } from "./Pedidos";
+
+//const memoria = localStorage.getItem('metas');
+const memoria = false;
+const estadoInicial = memoria ? JSON.parse(memoria): {
+    orden:[],
+    objetos : {}
+};
+
+function reductor(estado, accion){
+    switch(accion.tipo){
+        case 'colocar':{
+            const metas = accion.metas;
+            const nuevoEstado = {
+                orden: metas.map(meta => meta.id),
+                objetos: metas.reduce(((objeto, meta) =>({...objeto, [meta.id]:meta})),{})
+            }
+            //localStorage.setItem('metas', JSON.stringify(nuevoEstado));
+            return nuevoEstado;
+        };
+        case 'crear':{
+            const meta = accion.meta;
+            const id = meta.id;
+            const nuevoEstado = {
+                orden: [...estado.orden, id],
+                objetos: {...estado.objetos, [id] : meta}
+            }
+            return nuevoEstado;       
+        }
+        case 'actualizar':{
+            const metaActualizada = accion.meta;
+            const idActualizar = metaActualizada.id;
+            const nuevoEstado = {
+                orden : [...estado.orden],
+                objetos: {...estado.objetos, [idActualizar] : metaActualizada}
+            }
+           
+            return nuevoEstado;  
+        }
+        case 'eliminar':{
+            const id = accion.id;
+            const nuevoOrden = estado.orden.filter(item =>item !== id);    
+            delete estado.objetos[id];
+            const nuevoEstado = {
+                orden : nuevoOrden,
+                objetos: estado.objetos
+            }
+            return nuevoEstado;            
+        }
+    }
+}
+
+export const Contexto = createContext(null);
+
+function Memoria({children}) {
+    const [estado, enviar]=useReducer(reductor, estadoInicial);
+    return ( 
+    <Contexto.Provider value={[estado, enviar]}>
+        {children}
+    </Contexto.Provider>
+    );
+}
+
+export default Memoria;
+
+
+
 
 
 
@@ -33,68 +100,6 @@ import { Children, createContext, useReducer } from "react";
         "completado":100
     }
 ] ; */
-const memoria = localStorage.getItem('metas');
-const estadoInicial = memoria ? JSON.parse(memoria): {
-    orden:[],
-    objetos : {}
-};
 
-function reductor(estado, accion){
-    switch(accion.tipo){
-        case 'colocar':{
-            const metas = accion.metas;
-            const nuevoEstado = {
-                orden: metas.map(meta => meta.id),
-                objetos: metas.reduce(((objeto, meta) =>({...objeto, [meta.id]:meta})),{})
-            }
-            localStorage.setItem('metas', JSON.stringify(nuevoEstado));
-            return nuevoEstado;
-        };
-        case 'crear':{
-            const id = Math.random();
-            let meta = accion.meta;
-            meta = {...meta, "id": id}            
-            const nuevoEstado = {
-                orden: [...estado.orden, id],
-                objetos: {...estado.objetos, [id] : meta}
-            }
-            localStorage.setItem('metas', JSON.stringify(nuevoEstado));
-            return nuevoEstado;            
-        }
-        case 'actualizar':{
-            const metaActualizada = accion.meta;
-            const idActualizar = metaActualizada.id;
-            const nuevoEstado = {
-                orden : [...estado.orden],
-                objetos: {...estado.objetos, [idActualizar] : metaActualizada}
-            }
-            localStorage.setItem('metas', JSON.stringify(nuevoEstado));
-            return nuevoEstado;        
-        }
-        case 'eliminar':{
-            const id = accion.id;
-            const nuevoOrden = estado.orden.filter(item =>item !== id);    
-            delete estado.objetos[id];
-            const nuevoEstado = {
-                orden : nuevoOrden,
-                objetos: estado.objetos
-            }
-            localStorage.setItem('metas', JSON.stringify(nuevoEstado));
-            return nuevoEstado;  
-        }
-    }
-}
+
 //const metasInicial = reductor(estadoInicial, {tipo:'colocar', metas:listaMock});
-
-export const Contexto = createContext(null);
-
-function Memoria({children}) {
-    const [estado, enviar]=useReducer(reductor, estadoInicial);
-    return ( 
-    <Contexto.Provider value={[estado, enviar]}>
-        {children}
-    </Contexto.Provider>
-    );
-}
-
-export default Memoria;
